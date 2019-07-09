@@ -16,7 +16,7 @@
         android:label="flutter_careem_demo"
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAo-kzYDlzuzul8whhEIoX-EZ11kLa5zrM"/>
+            android:value="--"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
