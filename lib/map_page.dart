@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_careem_demo/resources.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 
 class MapScreen extends StatelessWidget {
   @override
@@ -25,11 +26,13 @@ class _MapBodyState extends State<MapBody> with SingleTickerProviderStateMixin {
   Marker currentPositionMarker;
   static const MARKER_ID = "markerID";
   Set<Marker> markers;
+  var location = new Location();
 
 
   @override
   void initState() {
     super.initState();
+    _initCurrentLocation();
     markers = new Set();
   }
 
@@ -89,6 +92,7 @@ class _MapBodyState extends State<MapBody> with SingleTickerProviderStateMixin {
                 GestureDetector(
                   onTap: () {
                     print('here');
+                    _goToMyLocation();
                   },
                   child: Align(
                     alignment: Alignment.centerRight,
@@ -117,6 +121,48 @@ class _MapBodyState extends State<MapBody> with SingleTickerProviderStateMixin {
         ]),
       ),
     );
+  }
+
+
+  _goToMyLocation() async{
+    var currentPosition = await location.getLocation();
+    if(currentPosition != null){
+      _googleMapController.animateCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(
+              bearing: 192.8334901395799,
+              target: LatLng(currentPosition.latitude, currentPosition.longitude),
+              tilt: 59.440717697143555,
+              zoom: 19.151926040649414
+          )
+      ));
+      drawMarker(LatLng(currentPosition.latitude, currentPosition.longitude));
+    }
+  }
+
+  _initCurrentLocation() async{
+//    LocationData currentLocationData;
+//    String error;
+
+    var serviceEnabled = await location.serviceEnabled();
+    if(!serviceEnabled){
+      await location.requestService();
+    }
+//
+//    try {
+//      currentLocationData = await location.getLocation();
+//    } on PlatformException catch (e) {
+//      if (e.code == 'PERMISSION_DENIED') {
+//        error = 'Permission denied';
+//      }
+//      currentLocationData = null;
+//    }
+
+
+    var currentPosition = await location.getLocation();
+    if(currentPosition != null){
+      drawMarker(LatLng(currentPosition.latitude, currentPosition.longitude));
+      currentLocation = LatLng(currentPosition.latitude, currentPosition.longitude); // init currentLocation
+    }
   }
 
   void _onMapCreated(GoogleMapController controller) async {
